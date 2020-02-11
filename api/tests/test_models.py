@@ -14,6 +14,10 @@ class CommunityModelsTest(APITestCase):
         community = Community(name='django')
         self.assertEqual(str(community), community.name)
 
+    def test_name_is_primary_key(self):
+        community = Community.objects.create(name='django')
+        self.assertEqual(community.pk, community.name)
+
     def test_cannot_save_empty_community(self):
         community = Community()
         with self.assertRaises(ValidationError):
@@ -90,8 +94,29 @@ class PostModelsTest(APITestCase):
         post_one = Post.objects.create(**self.data_one)
         self.assertEqual(post_one.slug, 'testing-in-django')
 
+    def test_change_to_post_body_doesnt_change_id(self):
+        post_one = Post.objects.create(**self.data_one)
+        old_id = post_one.id
+        post_one.body = 'new body'
+        post_one.save()
+        new_id = post_one.id
+        self.assertEqual(old_id, new_id)
 
+    def test_to_post_body_make_edited_true(self):
+        post_one = Post.objects.create(**self.data_one)
+        post_one.body = 'new body'
+        post_one.save()
+        self.assertEqual(post_one.edited, True)
 
 
 class CommentModelsTest(APITestCase):
-    pass
+
+    def setUp(self) -> None:
+        self.user_one = User.objects.create(username='user_one')
+        com = Community.objects.create(name='django')
+        self.post = Post.objects.create(
+            user=self.user_one,
+            community=com,
+            name='Testing in django',
+            body='How to test using mocks?'
+        )

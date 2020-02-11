@@ -24,13 +24,15 @@ class Post(models.Model):
     body = models.TextField(default='', null=False)
     slug = models.SlugField(blank=False, null=False)
     community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    edited = models.BooleanField(default=False)
 
     objects = PostManager()
 
-    def __str__(self):
-        return f'[id:{self.id}]Post:{self.name} by {self.user} in {self.community} community: {self.body}'
-
-    def save(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # save body for edited tag
+        self.__original_body = self.body
+        # create slug
         self.slug = slugify(str(self.name))
         # generate random 6 letter key
         while True:
@@ -38,6 +40,13 @@ class Post(models.Model):
             if not Post.objects.filter(id=new_id).exists():
                 break
         self.id = new_id
+
+    def __str__(self):
+        return f'[id:{self.id}]Post:{self.name} by {self.user} in {self.community} community: {self.body}'
+
+    def save(self, *args, **kwargs):
+        if self.body != self.__original_body:
+            self.edited = True
         return super().save(*args, **kwargs)
 
 
@@ -53,11 +62,17 @@ class Comment(models.Model):
 
     objects = CommentManager()
 
-    def save(self, *args, **kwargs):
-        # generate random 6 letter key
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_text = self.text
         while True:
             new_id = str(uuid.uuid4()).lower()[:6]
             if not Comment.objects.filter(id=new_id).exists():
                 break
         self.id = new_id
+
+    def save(self, *args, **kwargs):
+        # generate random 6 letter key
+        if self.text != self.__original_text:
+            self.edited = True
         return super().save(*args, **kwargs)
