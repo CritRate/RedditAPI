@@ -42,7 +42,7 @@ class Post(models.Model):
         self.id = new_id
 
     def __str__(self):
-        return f'[id:{self.id}]Post:{self.name} by {self.user} in {self.community} community: {self.body}'
+        return f'[id:{self.id}] Post:{self.name} by {self.user} in {self.community} community: {self.body}'
 
     def save(self, *args, **kwargs):
         if self.body != self.__original_body:
@@ -70,6 +70,9 @@ class Comment(models.Model):
             if not Comment.objects.filter(id=new_id).exists():
                 break
         self.id = new_id
+
+    def __str__(self):
+        return f'[id:{self.id}] Comment: {self.text} by User: {self.user} in Post: {self.post.name}'
 
     def save(self, *args, **kwargs):
         # generate random 6 letter key

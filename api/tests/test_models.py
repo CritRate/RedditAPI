@@ -78,7 +78,7 @@ class PostModelsTest(APITestCase):
         post = Post.objects.create(**self.data_one)
         self.assertEqual(
             str(post),
-            f'[id:{post.id}]Post:{post.name} by {post.user} in {post.community} community: {post.body}'
+            f'[id:{post.id}] Post:{post.name} by {post.user} in {post.community} community: {post.body}'
         )
 
     def test_id_is_6_characters_long(self):
@@ -104,9 +104,10 @@ class PostModelsTest(APITestCase):
 
     def test_to_post_body_make_edited_true(self):
         post_one = Post.objects.create(**self.data_one)
+        self.assertFalse(post_one.edited)
         post_one.body = 'new body'
         post_one.save()
-        self.assertEqual(post_one.edited, True)
+        self.assertTrue(post_one.edited)
 
 
 class CommentModelsTest(APITestCase):
@@ -120,3 +121,48 @@ class CommentModelsTest(APITestCase):
             name='Testing in django',
             body='How to test using mocks?'
         )
+        self.data = {
+            'text': 'just use documentation',
+            'user': self.user_one,
+            'post': self.post
+        }
+
+    def test_string_representation(self):
+        comment = Comment.objects.create(**self.data)
+        self.assertEqual(
+            str(comment),
+            f'[id:{comment.id}] Comment: {comment.text} by User: {comment.user} in Post: {comment.post.name}'
+        )
+
+    def test_default_value_for_reply_id_is_none(self):
+        comment = Comment.objects.create(**self.data)
+        self.assertIsNone(comment.reply_id)
+
+    def test_comments_have_different_ids(self):
+        comment_one = Comment.objects.create(**self.data)
+        comment_two = Comment.objects.create(**self.data)
+        self.assertNotEqual(comment_one.id, comment_two.id)
+
+    def test_comment_id_does_not_change(self):
+        comment = Comment.objects.create(**self.data)
+        old_id = comment.id
+        comment.text = 'new text'
+        comment.save()
+        new_id = comment.id
+        self.assertEqual(old_id, new_id)
+
+    def test_edited_comment_changes_flag_to_true(self):
+        comment = Comment.objects.create(**self.data)
+        self.assertFalse(comment.edited)
+        comment.text = 'new text'
+        comment.save()
+        self.assertTrue(comment.edited)
+
+    def test_reply_id_contains_correct_top_comment(self):
+        top_comment = Comment.objects.create(**self.data)
+        reply = Comment.objects.create(reply_id=top_comment, **self.data)
+        self.assertEqual(reply.reply_id.id, top_comment.id)
+
+    def test_id_is_6_letters_long(self):
+        comment = Comment.objects.create(**self.data)
+        self.assertEqual(len(comment.id), 6)
