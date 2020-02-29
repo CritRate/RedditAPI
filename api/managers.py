@@ -10,4 +10,4 @@ class PostManager(models.Manager):
 class CommentManager(models.Manager):
 
     def get_community_comments(self, community: str):
-        return self.filter(community__name=community)
+        return self.filter(comment__post__community=community)

@@ -45,7 +45,7 @@ class CommunityModelsTest(APITestCase):
         with self.assertRaises(DataError):
             Community.objects.create(name=long_name)
 
-    # def test_cant_have_more_that_ten_moderators(self):
+    # def test_cant_have_more_than_ten_moderators(self):
     #     community = Community.objects.create(name='django')
     #     users = []
     #     for i in range(15):
