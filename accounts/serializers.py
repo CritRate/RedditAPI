@@ -4,7 +4,10 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserCommunitySerializer(serializers.ModelSerializer):
     class Meta:
-        mode = User
-        fields = ('username', 'email')
+        model = User
+        fields = ('username',)
+        extra_kwargs = {
+            'username': {'validators': []}
+        }

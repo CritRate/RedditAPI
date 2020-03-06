@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 164964
+      POSTGRES_DB: redditdb
+    ports:
+    - "5432:5432"
+  web:
+    build: .
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    container_name: redditapi
+    volumes:
+    - .:/redditapi
+    ports:
+    - "8000:8000"
+    depends_on:
+      - db

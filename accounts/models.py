@@ -21,6 +21,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
+    def get_json(self):
+        return {
+            'username': self.username
+        }
+
     def get_full_name(self):
         return self.username
 

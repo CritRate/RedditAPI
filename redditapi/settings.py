@@ -24,8 +24,6 @@ SECRET_KEY = 'e$y25^qjf1t&mg&l54&j_!1zfi+vx9^+*ss4&ye*eg!!a1=%um'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'api',
     'accounts',
 ]
@@ -76,12 +75,12 @@ WSGI_APPLICATION = 'redditapi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'redditdb',
-        'USER': 'crit',
+        'USER': 'postgres',
         'PASSWORD': '164964',
-        'HOST': 'localhost',
-        'PORT': ''
+        'HOST': 'db',
+        'PORT': '5432'
     }
 }
 
@@ -123,3 +122,5 @@ STATIC_URL = '/static/'
 
 # Custom User
 AUTH_USER_MODEL = 'accounts.User'
+
+ALLOWED_HOSTS = ['*']
